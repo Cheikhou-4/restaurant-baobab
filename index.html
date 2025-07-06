@@ -181,9 +181,11 @@
                         <p class="text-gray-600 mb-4">Beignets de morue parfumés aux herbes et épices, servis avec une sauce piquante.</p>
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-bold text-yellow-600">5,240 FCFA</span>
-                            <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300">
-                                Commander
-                            </button>
+                            <button 
+  class="btnCommander bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+  data-plat="Accras de morue">
+  Commander
+</button>
                         </div>
                     </div>
                 </div>
@@ -199,9 +201,11 @@
                         <p class="text-gray-600 mb-4">Le plat national sénégalais : riz au poisson avec légumes, cuisiné dans une sauce tomate parfumée.</p>
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-bold text-yellow-600">10,480 FCFA</span>
-                            <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300">
-                                Commander
-                            </button>
+                            <button 
+  class="btnCommander bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+  data-plat="Thieboudienne">
+  Commander
+</button>
                         </div>
                     </div>
                 </div>
@@ -217,9 +221,12 @@
                         <p class="text-gray-600 mb-4">Poulet mariné au citron et oignons, servi avec du riz blanc. Un classique de la cuisine sénégalaise.</p>
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-bold text-yellow-600">9,825 FCFA</span>
-                            <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300">
-                                Commander
-                            </button>
+                            <button 
+  class="btnCommander bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+  data-plat="Yassa Poulet">
+  Commander
+</button>
+
                         </div>
                     </div>
                 </div>
@@ -235,9 +242,11 @@
                         <p class="text-gray-600 mb-4">Mélange frais de légumes locaux avec une vinaigrette à l'huile d'arachide et citron.</p>
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-bold text-yellow-600">4,585 FCFA</span>
-                            <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300">
-                                Commander
-                            </button>
+                            <button 
+  class="btnCommander bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+  data-plat="Salade sénégalaise">
+  Commander
+</button>
                         </div>
                     </div>
                 </div>
@@ -253,9 +262,11 @@
                         <p class="text-gray-600 mb-4">Dessert traditionnel à base de mil, yaourt et fruits secs, parfumé à la vanille.</p>
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-bold text-yellow-600">3,930 FCFA</span>
-                            <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300">
-                                Commander
-                            </button>
+                            <button 
+  class="btnCommander bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+  data-plat="Thiakry">
+  Commander
+</button>
                         </div>
                     </div>
                 </div>
@@ -271,9 +282,11 @@
                         <p class="text-gray-600 mb-4">Ragoût de viande (bœuf ou agneau) dans une sauce à la pâte d'arachide, servi avec du riz.</p>
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-bold text-yellow-600">11,135 FCFA</span>
-                            <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300">
-                                Commander
-                            </button>
+                            <button 
+  class="btnCommander bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+  data-plat="Mafé">
+  Commander
+</button>
                         </div>
                     </div>
                 </div>
@@ -286,6 +299,58 @@
             </div>
         </div>
     </section>
+    <section id="commande" class="hidden py-16 bg-gray-100">
+  <div class="container mx-auto px-4 max-w-2xl">
+    <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Commander un plat</h2>
+
+    <form id="formCommande" class="bg-white p-8 rounded-lg shadow-md space-y-4">
+      <div>
+        <label for="plat" class="block mb-1 font-semibold">Plat</label>
+        <select id="plat" name="plat" class="w-full border border-gray-300 rounded p-2" required>
+          <option value="">-- Choisir un plat --</option>
+          <option value="Thieboudienne">Thieboudienne</option>
+          <option value="Yassa Poulet">Yassa Poulet</option>
+          <option value="Mafé">Mafé</option>
+          <option value="Salade sénégalaise">Salade sénégalaise</option>
+          <option value="Accras de morue">Accras de morue</option>
+          <option value="Thiakry">Thiakry</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="quantite" class="block mb-1 font-semibold">Quantité</label>
+        <input type="number" id="quantite" name="quantite" min="1" class="w-full border border-gray-300 rounded p-2" required>
+      </div>
+
+      <div>
+        <label for="nom" class="block mb-1 font-semibold">Nom complet</label>
+        <input type="text" id="nom" name="nom" class="w-full border border-gray-300 rounded p-2" required>
+      </div>
+
+      <div>
+        <label for="telephone" class="block mb-1 font-semibold">Téléphone</label>
+        <input type="tel" id="telephone" name="telephone" class="w-full border border-gray-300 rounded p-2" required>
+      </div>
+
+      <div>
+        <label for="adresse" class="block mb-1 font-semibold">Adresse de livraison</label>
+        <textarea id="adresse" name="adresse" class="w-full border border-gray-300 rounded p-2" rows="3" required></textarea>
+      </div>
+
+      <!-- Champ caché pour la date -->
+      <input type="hidden" name="date" id="dateCommande">
+
+      <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded w-full">
+        Valider la commande
+      </button>
+    </form>
+
+    <p id="confirmation" class="text-green-600 mt-4 text-center hidden font-semibold">
+      ✅ Commande envoyée avec succès !
+    </p>
+  </div>
+</section>
+
 
     <!-- Reservation Section -->
     <section id="reservation" class="py-20 bg-white">
@@ -649,91 +714,140 @@
         </div>
     </footer>
 
-    <script>
-        // Mobile menu toggle
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-        
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
+   <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script>
+  // Initialise EmailJS
+  (function () {
+    emailjs.init("51LSgeD5TYsxLrqWs"); // Remplace par ta clé publique EmailJS
+  })();
+
+  // 🍔 Menu mobile toggle
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  mobileMenuButton.addEventListener('click', () => {
+    mobileMenu.classList.toggle('hidden');
+  });
+
+  // 📋 Filtrage du menu
+  function filterMenu(category) {
+    const menuItems = document.querySelectorAll('.menu-items > div');
+
+    menuItems.forEach(item => {
+      if (category === 'all') {
+        item.classList.remove('hidden');
+      } else {
+        item.dataset.category === category
+          ? item.classList.remove('hidden')
+          : item.classList.add('hidden');
+      }
+    });
+
+    // Mettre à jour le style actif des boutons
+    document.querySelectorAll('.inline-flex button').forEach(button => {
+      button.classList.remove('bg-yellow-600', 'text-white');
+      button.classList.add('bg-white', 'text-gray-900');
+    });
+
+    event.target.classList.add('bg-yellow-600', 'text-white');
+    event.target.classList.remove('bg-white', 'text-gray-900');
+  }
+
+  // 📅 Animation fade-in
+  const fadeElements = document.querySelectorAll('.fade-in');
+  const fadeInObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('fade-in');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  fadeElements.forEach(element => {
+    fadeInObserver.observe(element);
+  });
+
+  // 🔗 Ancrage avec scroll doux
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href');
+      if (targetId === '#') return;
+
+      const targetElement = document.querySelector(targetId);
+      if (targetElement) {
+        window.scrollTo({
+          top: targetElement.offsetTop - 80,
+          behavior: 'smooth'
         });
-        
-        // Menu filtering
-        function filterMenu(category) {
-            const menuItems = document.querySelectorAll('.menu-items > div');
-            
-            menuItems.forEach(item => {
-                if (category === 'all') {
-                    item.classList.remove('hidden');
-                } else {
-                    if (item.dataset.category === category) {
-                        item.classList.remove('hidden');
-                    } else {
-                        item.classList.add('hidden');
-                    }
-                }
-            });
-            
-            // Update active tab styling
-            document.querySelectorAll('.inline-flex button').forEach(button => {
-                button.classList.remove('bg-yellow-600', 'text-white');
-                button.classList.add('bg-white', 'text-gray-900');
-            });
-            
-            event.target.classList.add('bg-yellow-600', 'text-white');
-            event.target.classList.remove('bg-white', 'text-gray-900');
+
+        // Ferme le menu mobile s'il est ouvert
+        if (!mobileMenu.classList.contains('hidden')) {
+          mobileMenu.classList.add('hidden');
         }
-        
-        // Form submission
-        document.getElementById('reservation-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Merci pour votre réservation ! Nous vous contacterons bientôt pour confirmation.');
-            this.reset();
-        });
-        
-        document.getElementById('contact-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Merci pour votre message ! Nous vous répondrons dans les plus brefs délais.');
-            this.reset();
-        });
-        
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 80,
-                        behavior: 'smooth'
-                    });
-                    
-                    // Close mobile menu if open
-                    if (!mobileMenu.classList.contains('hidden')) {
-                        mobileMenu.classList.add('hidden');
-                    }
-                }
-            });
-        });
-        
-        // Add fade-in animation when elements come into view
-        const fadeElements = document.querySelectorAll('.fade-in');
-        
-        const fadeInObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('fade-in');
-                }
-            });
-        }, { threshold: 0.1 });
-        
-        fadeElements.forEach(element => {
-            fadeInObserver.observe(element);
-        });
-    </script>
+      }
+    });
+  });
+
+  // 📨 Réservation (alerte simple)
+  const reservationForm = document.getElementById('reservation-form');
+  if (reservationForm) {
+    reservationForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      alert('Merci pour votre réservation ! Nous vous contacterons bientôt.');
+      this.reset();
+    });
+  }
+
+  // 📨 Contact (alerte simple)
+  const contactForm = document.getElementById('contact-form');
+  if (contactForm) {
+    contactForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      alert('Merci pour votre message ! Nous vous répondrons rapidement.');
+      this.reset();
+    });
+  }
+
+  // 🛒 COMMANDE DE PLATS
+  const boutonsCommander = document.querySelectorAll('.btnCommander');
+  const selectPlat = document.getElementById('plat');
+  const sectionCommande = document.getElementById('commande');
+  const form = document.getElementById('formCommande');
+  const confirmation = document.getElementById('confirmation');
+
+  // Quand on clique sur un bouton Commander
+  boutonsCommander.forEach(bouton => {
+    bouton.addEventListener('click', () => {
+      const plat = bouton.dataset.plat;
+      selectPlat.value = plat;
+      sectionCommande.classList.remove('hidden');
+      sectionCommande.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Soumission du formulaire de commande
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    // Ajoute la date actuelle dans le champ caché
+    document.getElementById('dateCommande').value = new Date().toLocaleString();
+
+    // Envoi via EmailJS
+    emailjs.sendForm('service_v774uxi', 'template_5nnp0v4', this)
+      .then(() => {
+        confirmation.classList.remove('hidden');
+        form.reset();
+
+        setTimeout(() => {
+          confirmation.classList.add('hidden');
+          sectionCommande.classList.add('hidden');
+        }, 3000);
+      }, (error) => {
+        alert("Erreur lors de l'envoi de la commande : " + error.text);
+      });
+  });
+</script>
+
 </body>
 </html>
