@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="./image/logo.png">
+    <title>Le Baobab - Restaurant Sénégalais</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom CSS for animations and effects */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+        }
+        
+        .dish-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .testimonial-card {
+            transition: all 0.3s ease;
+        }
+        
+        .testimonial-card:hover {
+            transform: scale(1.03);
+        }
+        
+        .gallery-item {
+            overflow: hidden;
+        }
+        
+        .gallery-item img {
+            transition: transform 0.5s ease;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white shadow-md z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex-shrink-0 flex items-center">
+                        <img class="h-10 w-auto" src="./image/logo.png" alt="Logo Baobab">
+                        <span class="ml-2 text-xl font-bold text-yellow-600">Le Baobab</span>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#accueil" class="text-gray-900 hover:text-yellow-600 px-3 py-2 font-medium">Accueil</a>
+                    <a href="#menu" class="text-gray-900 hover:text-yellow-600 px-3 py-2 font-medium">Menu</a>
+                    <a href="#reservation" class="text-gray-900 hover:text-yellow-600 px-3 py-2 font-medium">Réservation</a>
+                    <a href="#galerie" class="text-gray-900 hover:text-yellow-600 px-3 py-2 font-medium">Galerie</a>
+                    <a href="#temoignages" class="text-gray-900 hover:text-yellow-600 px-3 py-2 font-medium">Témoignages</a>
+                    <a href="#contact" class="text-gray-900 hover:text-yellow-600 px-3 py-2 font-medium">Contact</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="text-gray-900 hover:text-yellow-600">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#accueil" class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-yellow-600">Accueil</a>
+                <a href="#menu" class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-yellow-600">Menu</a>
+                <a href="#reservation" class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-yellow-600">Réservation</a>
+                <a href="#galerie" class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-yellow-600">Galerie</a>
+                <a href="#temoignages" class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-yellow-600">Témoignages</a>
+                <a href="#contact" class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-yellow-600">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="accueil" class="hero flex items-center justify-center text-center text-white pt-16">
+        <div class="max-w-4xl px-4 fade-in">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">Découvrez les saveurs du Sénégal</h1>
+            <p class="text-xl md:text-2xl mb-8">Une expérience culinaire authentique au cœur de la tradition sénégalaise</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#menu" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">Voir le menu</a>
+                <a href="#reservation" class="bg-transparent hover:bg-white hover:text-gray-900 text-white font-bold py-3 px-6 border-2 border-white rounded-lg transition duration-300">Réserver une table</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:flex lg:items-center lg:justify-between">
+                <div class="lg:w-1/2 mb-10 lg:mb-0">
+                    <img src="https://images.unsplash.com/photo-1559847844-5315695dadae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1998&q=80" alt="Cuisine sénégalaise" class="rounded-lg shadow-xl w-full h-auto">
+                </div>
+                <div class="lg:w-1/2 lg:pl-12">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6">Notre histoire</h2>
+                    <p class="text-gray-600 mb-6">Fondé en 2010, Le Baobab est bien plus qu'un simple restaurant. C'est une invitation à découvrir la richesse de la culture sénégalaise à travers sa gastronomie.</p>
+                    <p class="text-gray-600 mb-6">Notre chef, originaire de Dakar, a su allier tradition et modernité pour vous offrir des plats authentiques préparés avec des ingrédients frais et des épices soigneusement sélectionnées.</p>
+                    <p class="text-gray-600 mb-8">Chaque plat raconte une histoire, chaque saveur vous transporte au Sénégal, terre de <span class="text-yellow-600 font-medium">teranga</span> (hospitalité).</p>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="flex items-center">
+                            <div class="bg-yellow-100 p-3 rounded-full mr-3">
+                                <i class="fas fa-utensils text-yellow-600"></i>
+                            </div>
+                            <span class="font-medium">Cuisine authentique</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-yellow-100 p-3 rounded-full mr-3">
+                                <i class="fas fa-leaf text-yellow-600"></i>
+                            </div>
+                            <span class="font-medium">Produits frais</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-yellow-100 p-3 rounded-full mr-3">
+                                <i class="fas fa-heart text-yellow-600"></i>
+                            </div>
+                            <span class="font-medium">Préparé avec amour</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Notre Menu</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Découvrez nos spécialités sénégalaises préparées avec des ingrédients frais et des recettes traditionnelles.</p>
+            </div>
+            
+            <!-- Menu Tabs -->
+            <div class="flex justify-center mb-12">
+                <div class="inline-flex rounded-md shadow-sm">
+                    <button onclick="filterMenu('all')" class="px-4 py-2 text-sm font-medium rounded-l-lg bg-yellow-600 text-white">
+                        Tous
+                    </button>
+                    <button onclick="filterMenu('entrees')" class="px-4 py-2 text-sm font-medium bg-white text-gray-900 hover:bg-gray-50">
+                        Entrées
+                    </button>
+                    <button onclick="filterMenu('plats')" class="px-4 py-2 text-sm font-medium bg-white text-gray-900 hover:bg-gray-50">
+                        Plats principaux
+                    </button>
+                    <button onclick="filterMenu('desserts')" class="px-4 py-2 text-sm font-medium rounded-r-lg bg-white text-gray-900 hover:bg-gray-50">
+                        Desserts
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Menu Items -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 menu-items">
+                <!-- Entrée 1 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden dish-card transition duration-300 entree" data-category="entrees">
+                    <img src="./image/accras-de-morue.webp" alt="Accras" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-gray-900">Accras de morue</h3>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Entrée</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Beignets de morue parfumés aux herbes et épices, servis avec une sauce piquante.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-yellow-600">5,240 FCFA</span>
+                            <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                                Commander
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Plat 1 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden dish-card transition duration-300 plat" data-category="plats">
+                    <img src="./image/Thieboudienne.jpeg" alt="Thieboudienne" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-gray-900">Thieboudienne</h3>
+                            <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Plat</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Le plat national sénégalais : riz au poisson avec légumes, cuisiné dans une sauce tomate parfumée.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-yellow-600">10,480 FCFA</span>
+                            <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                                Commander
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Plat 2 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden dish-card transition duration-300 plat" data-category="plats">
+                    <img src="./image/Yassa poulet.jpeg" alt="Yassa" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-gray-900">Yassa poulet</h3>
+                            <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Plat</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Poulet mariné au citron et oignons, servi avec du riz blanc. Un classique de la cuisine sénégalaise.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-yellow-600">9,825 FCFA</span>
+                            <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                                Commander
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Entrée 2 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden dish-card transition duration-300 entree" data-category="entrees">
+                    <img src="./image/Salade sénégalaise.jpeg" alt="Salade sénégalaise" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-gray-900">Salade sénégalaise</h3>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Entrée</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Mélange frais de légumes locaux avec une vinaigrette à l'huile d'arachide et citron.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-yellow-600">4,585 FCFA</span>
+                            <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                                Commander
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dessert 1 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden dish-card transition duration-300 dessert" data-category="desserts">
+                    <img src="./image/Thiakry.jpeg" alt="Thiakry" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-gray-900">Thiakry</h3>
+                            <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded">Dessert</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Dessert traditionnel à base de mil, yaourt et fruits secs, parfumé à la vanille.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-yellow-600">3,930 FCFA</span>
+                            <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                                Commander
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Plat 3 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden dish-card transition duration-300 plat" data-category="plats">
+                    <img src="./image/Mafé.jpeg" alt="Mafé" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-gray-900">Mafé</h3>
+                            <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Plat</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Ragoût de viande (bœuf ou agneau) dans une sauce à la pâte d'arachide, servi avec du riz.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-yellow-600">11,135 FCFA</span>
+                            <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                                Commander
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <a href="#" class="inline-block bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                    Voir tout le menu
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reservation Section -->
+    <section id="reservation" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:flex lg:items-center lg:justify-between">
+                <div class="lg:w-1/2 mb-10 lg:mb-0">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6">Réservez votre table</h2>
+                    <p class="text-gray-600 mb-6">Vivez une expérience culinaire unique dans notre restaurant. Réservez dès maintenant pour garantir votre place.</p>
+                    <p class="text-gray-600 mb-8">Nous sommes ouverts du mardi au dimanche, de 11h30 à 22h30.</p>
+                    <div class="flex items-center mb-4">
+                        <div class="bg-yellow-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-phone text-yellow-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Pour les réservations par téléphone</p>
+                            <p class="text-xl font-bold text-gray-900">221 78 501 65 71</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="bg-yellow-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-envelope text-yellow-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Ou par email</p>
+                            <p class="text-xl font-bold text-gray-900">reservation@lebaobab.com</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 lg:pl-12">
+                    <div class="bg-gray-50 p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-6">Formulaire de réservation</h3>
+                        <form id="reservation-form">
+                            <div class="mb-4">
+                                <label for="name" class="block text-gray-700 font-medium mb-2">Nom complet</label>
+                                <input type="text" id="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
+                                <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="phone" class="block text-gray-700 font-medium mb-2">Téléphone</label>
+                                <input type="tel" id="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label for="date" class="block text-gray-700 font-medium mb-2">Date</label>
+                                    <input type="date" id="date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
+                                </div>
+                                <div>
+                                    <label for="time" class="block text-gray-700 font-medium mb-2">Heure</label>
+                                    <input type="time" id="time" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="guests" class="block text-gray-700 font-medium mb-2">Nombre de personnes</label>
+                                <select id="guests" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
+                                    <option value="1">1 personne</option>
+                                    <option value="2">2 personnes</option>
+                                    <option value="3">3 personnes</option>
+                                    <option value="4">4 personnes</option>
+                                    <option value="5">5 personnes</option>
+                                    <option value="6">6 personnes</option>
+                                    <option value="7">7 personnes</option>
+                                    <option value="8">8 personnes</option>
+                                    <option value="9">9 personnes ou plus</option>
+                                </select>
+                            </div>
+                            <div class="mb-6">
+                                <label for="message" class="block text-gray-700 font-medium mb-2">Demandes spéciales</label>
+                                <textarea id="message" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                                Réserver maintenant
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="galerie" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Notre Galerie</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Un aperçu de notre restaurant, de nos plats et de l'ambiance chaleureuse qui vous attend.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="gallery-item rounded-lg overflow-hidden shadow-md">
+                    <img src="./image/Salade sénégalaise.jpeg" alt="Restaurant" class="w-full h-64 object-cover">
+                </div>
+                <div class="gallery-item rounded-lg overflow-hidden shadow-md">
+                    <img src="./image/Thiakry.jpeg" alt="Plat" class="w-full h-64 object-cover">
+                </div>
+                <div class="gallery-item rounded-lg overflow-hidden shadow-md">
+                    <img src="https://images.unsplash.com/photo-1603360946369-dc9bb6258143?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Plat" class="w-full h-64 object-cover">
+                </div>
+                <div class="gallery-item rounded-lg overflow-hidden shadow-md">
+                    <img src="https://images.unsplash.com/photo-1559847844-5315695dadae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Cuisine" class="w-full h-64 object-cover">
+                </div>
+                <div class="gallery-item rounded-lg overflow-hidden shadow-md">
+                    <img src="./image/Yassa poulet.jpeg" alt="Plat" class="w-full h-64 object-cover">
+                </div>
+                <div class="gallery-item rounded-lg overflow-hidden shadow-md">
+                    <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Dessert" class="w-full h-64 object-cover">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="temoignages" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Ce que disent nos clients</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Découvrez les témoignages de ceux qui ont déjà vécu l'expérience Le Baobab.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-gray-50 p-8 rounded-lg shadow-md testimonial-card">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-500 text-xl mr-2">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-6">"Le Thieboudienne était absolument délicieux, exactement comme au Sénégal. L'ambiance est chaleureuse et le service impeccable. Je recommande vivement !"</p>
+                    <div class="flex items-center">
+                        <img src="./image/c1.jpeg" alt="Client" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold text-gray-900">Aïda Diop</h4>
+                            <p class="text-gray-500">Client régulier</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-gray-50 p-8 rounded-lg shadow-md testimonial-card">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-500 text-xl mr-2">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-6">"Une véritable découverte culinaire ! Les saveurs sont authentiques et les portions généreuses. Le Yassa poulet est mon préféré. À refaire sans hésiter."</p>
+                    <div class="flex items-center">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Client" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold text-gray-900">Thomas Martin</h4>
+                            <p class="text-gray-500">Première visite</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-gray-50 p-8 rounded-lg shadow-md testimonial-card">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-500 text-xl mr-2">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-6">"En tant que Sénégalaise expatriée, ce restaurant me rappelle les saveurs de mon enfance. Le chef a vraiment capturé l'essence de la cuisine sénégalaise."</p>
+                    <div class="flex items-center">
+                        <img src="./image/c2.jpeg" alt="Client" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold text-gray-900">Fatou Ndiaye</h4>
+                            <p class="text-gray-500">Client fidèle</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:flex lg:items-center lg:justify-between">
+                <div class="lg:w-1/2 mb-10 lg:mb-0">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6">Contactez-nous</h2>
+                    <p class="text-gray-600 mb-8">Nous sommes à votre disposition pour répondre à toutes vos questions. N'hésitez pas à nous contacter par téléphone, email ou en vous rendant directement dans notre restaurant.</p>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Nos horaires</h3>
+                        <ul class="space-y-2">
+                          <li class="flex justify-between">
+                                <span class="text-gray-600">Lundi</span>
+                                <span class="font-medium">11h30 - 22h00</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span class="text-gray-600">Mardi - Jeudi</span>
+                                <span class="font-medium">11h30 - 22h30</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span class="text-gray-600">Vendredi - Samedi</span>
+                                <span class="font-medium">11h30 - 23h30</span>
+                            </li>
+                            
+                            <li class="flex justify-between">
+                                <span class="text-gray-600">Dimanche</span>
+                                <span class="font-medium">Fermé</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Nous trouver</h3>
+                        <div class="flex items-start mb-4">
+                            <div class="bg-yellow-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-map-marker-alt text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-600">123 Avenue de la Teranga</p>
+                                <p class="text-gray-600">Keur Massar, Dakar, Senegal</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center mb-4">
+                            <div class="bg-yellow-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-phone text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-600">221 78 607 94 71</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-yellow-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-envelope text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-600">contact@lebaobab.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:w-1/2 lg:pl-12">
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-6">Envoyez-nous un message</h3>
+                        <form id="contact-form">
+                            <div class="mb-4">
+                                <label for="contact-name" class="block text-gray-700 font-medium mb-2">Nom complet</label>
+                                <input type="text" id="contact-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="contact-email" class="block text-gray-700 font-medium mb-2">Email</label>
+                                <input type="email" id="contact-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="contact-subject" class="block text-gray-700 font-medium mb-2">Sujet</label>
+                                <input type="text" id="contact-subject" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
+                            </div>
+                            <div class="mb-6">
+                                <label for="contact-message" class="block text-gray-700 font-medium mb-2">Message</label>
+                                <textarea id="contact-message" rows="5" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                                Envoyer le message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <div class="h-96 w-full">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10187755.410195619!2d-17.8809718814943!3d14.497401340143975!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xec1723c3613edc1%3A0xe8ea631eb2f8ef90!2sS%C3%A9n%C3%A9gal!5e0!3m2!1sfr!2ssn!4v1719935420702!5m2!1sfr!2ssn" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <a href="#" class="flex items-center mb-6">
+                        <img class="h-10 w-auto" src="./image/logo.png" alt="Logo Baobab">
+                        <span class="ml-2 text-xl font-bold text-yellow-600">Le Baobab</span>
+                    </a>
+                    <p class="text-gray-400">Découvrez les saveurs authentiques du Sénégal dans une ambiance chaleureuse et conviviale.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Liens rapides</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#accueil" class="text-gray-400 hover:text-yellow-600 transition duration-300">Accueil</a></li>
+                        <li><a href="#menu" class="text-gray-400 hover:text-yellow-600 transition duration-300">Menu</a></li>
+                        <li><a href="#reservation" class="text-gray-400 hover:text-yellow-600 transition duration-300">Réservation</a></li>
+                        <li><a href="#galerie" class="text-gray-400 hover:text-yellow-600 transition duration-300">Galerie</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-yellow-600 transition duration-300">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Horaires</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex justify-between">
+                            <span>Mardi - Jeudi</span>
+                            <span>11h30 - 22h30</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>Vendredi - Samedi</span>
+                            <span>11h30 - 23h30</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>Dimanche</span>
+                            <span>11h30 - 22h00</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>Lundi</span>
+                            <span>Fermé</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contact</h3>
+                    <address class="not-italic text-gray-400">
+                        <p class="mb-2">123 Avenue de la Teranga</p>
+                        <p class="mb-2">75000 Paris, France</p>
+                        <p class="mb-2">01 23 45 67 89</p>
+                        <p>contact@lebaobab.com</p>
+                    </address>
+                    
+                    <div class="mt-4 flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-yellow-600 transition duration-300">
+                            <i class="fab fa-facebook-f text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-yellow-600 transition duration-300">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-yellow-600 transition duration-300">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">© 2023 Le Baobab. Tous droits réservés.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-yellow-600 text-sm transition duration-300">Politique de confidentialité</a>
+                    <a href="#" class="text-gray-400 hover:text-yellow-600 text-sm transition duration-300">Conditions d'utilisation</a>
+                    <a href="#" class="text-gray-400 hover:text-yellow-600 text-sm transition duration-300">Mentions légales</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Menu filtering
+        function filterMenu(category) {
+            const menuItems = document.querySelectorAll('.menu-items > div');
+            
+            menuItems.forEach(item => {
+                if (category === 'all') {
+                    item.classList.remove('hidden');
+                } else {
+                    if (item.dataset.category === category) {
+                        item.classList.remove('hidden');
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                }
+            });
+            
+            // Update active tab styling
+            document.querySelectorAll('.inline-flex button').forEach(button => {
+                button.classList.remove('bg-yellow-600', 'text-white');
+                button.classList.add('bg-white', 'text-gray-900');
+            });
+            
+            event.target.classList.add('bg-yellow-600', 'text-white');
+            event.target.classList.remove('bg-white', 'text-gray-900');
+        }
+        
+        // Form submission
+        document.getElementById('reservation-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Merci pour votre réservation ! Nous vous contacterons bientôt pour confirmation.');
+            this.reset();
+        });
+        
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Merci pour votre message ! Nous vous répondrons dans les plus brefs délais.');
+            this.reset();
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+        });
+        
+        // Add fade-in animation when elements come into view
+        const fadeElements = document.querySelectorAll('.fade-in');
+        
+        const fadeInObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        fadeElements.forEach(element => {
+            fadeInObserver.observe(element);
+        });
+    </script>
+</body>
+</html>
