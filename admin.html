@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Le Baobab</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  </head>
+<body class="bg-gray-100 font-sans">
+
+  <div class="max-w-6xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold text-center mb-8 text-yellow-600">📋 Tableau de bord des commandes</h1>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white shadow rounded-lg">
+        <thead class="bg-yellow-600 text-white">
+          <tr>
+            <th class="py-3 px-4 text-left">Code</th>
+            <th class="py-3 px-4 text-left">Client</th>
+            <th class="py-3 px-4 text-left">Plat</th>
+            <th class="py-3 px-4 text-left">Quantité</th>
+            <th class="py-3 px-4 text-left">Téléphone</th>
+            <th class="py-3 px-4 text-left">Adresse</th>
+            <th class="py-3 px-4 text-left">Date</th>
+            <th class="py-3 px-4 text-left">Statut</th>
+            <th class="py-3 px-4 text-left">Action</th>
+          </tr>
+        </thead>
+        <tbody id="listeCommandes"></tbody>
+      </table>
+      <h2 class="text-2xl font-bold text-yellow-600 mt-12 mb-4">📅 Réservations</h2>
+<div class="overflow-x-auto mb-12">
+  <table class="min-w-full bg-white shadow rounded-lg">
+    <thead class="bg-yellow-600 text-white">
+      <tr>
+        <th class="py-3 px-4 text-left">Nom</th>
+        <th class="py-3 px-4 text-left">Téléphone</th>
+        <th class="py-3 px-4 text-left">Email</th>
+        <th class="py-3 px-4 text-left">Date</th>
+        <th class="py-3 px-4 text-left">Heure</th>
+        <th class="py-3 px-4 text-left">Personnes</th>
+        <th class="py-3 px-4 text-left">Demandes</th>
+        <th class="py-3 px-4 text-left">Statut</th>
+        <th class="py-3 px-4 text-left">Action</th>
+      </tr>
+    </thead>
+    <tbody id="listeReservations"></tbody>
+  </table>
+</div>
+
+    </div>
+
+    <h2 class="text-3xl font-bold text-center mb-8 text-yellow-600">🍽️ Gestion des Plats</h2>
+    <div class="bg-white p-8 rounded-lg shadow-md mb-8">
+      <h3 class="text-2xl font-bold mb-6 text-gray-800">Ajouter un nouveau plat</h3>
+      <form id="addDishForm" class="space-y-4">
+        <div>
+          <label for="dishName" class="block font-semibold mb-1">Nom du plat</label>
+          <input type="text" id="dishName" class="w-full border border-gray-300 rounded p-2" required>
+        </div>
+        <div>
+          <label for="dishDescription" class="block font-semibold mb-1">Description</label>
+          <textarea id="dishDescription" class="w-full border border-gray-300 rounded p-2" rows="3" required></textarea>
+        </div>
+        <div>
+          <label for="dishPrice" class="block font-semibold mb-1">Prix (FCFA)</label>
+          <input type="number" id="dishPrice" class="w-full border border-gray-300 rounded p-2" required min="0">
+        </div>
+        <div>
+          <label for="dishCategory" class="block font-semibold mb-1">Catégorie</label>
+          <select id="dishCategory" class="w-full border border-gray-300 rounded p-2" required>
+            <option value="">-- Choisir une catégorie --</option>
+            <option value="entrees">Entrées</option>
+            <option value="plats">Plats principaux</option>
+            <option value="desserts">Desserts</option>
+          </select>
+        </div>
+        <div>
+          <label for="dishImageUrl" class="block font-semibold mb-1">URL de l'image (copiez depuis Imgur)</label>
+          <input type="url" id="dishImageUrl" class="w-full border border-gray-300 rounded p-2" placeholder="Ex: https://i.imgur.com/votreimage.jpg" required>
+        </div>
+        <button type="submit" id="addDishButton" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded w-full">
+          Ajouter le plat
+        </button>
+        <p id="dishAddMessage" class="mt-2 text-center text-sm hidden"></p>
+      </form>
+    </div>
+
+    <div class="bg-white p-8 rounded-lg shadow-md">
+      <h3 class="text-2xl font-bold mb-6 text-gray-800">Liste des plats</h3>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white">
+          <thead class="bg-gray-200 text-gray-700">
+            <tr>
+              <th class="py-3 px-4 text-left">Nom</th>
+              <th class="py-3 px-4 text-left">Catégorie</th>
+              <th class="py-3 px-4 text-left">Prix</th>
+              <th class="py-3 px-4 text-left">Image</th>
+              <th class="py-3 px-4 text-left">Action</th>
+            </tr>
+          </thead>
+          <tbody id="listePlats">
+            </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="text-center mt-6">
+    <a href="login.html" class="text-gray-600 hover:text-yellow-600 text-sm underline">Revenir à la connexion</a>
+  </div>
+  <button onclick="firebase.auth().signOut().then(() => window.location.href='login.html')"
+class="text-sm text-red-600 hover:underline mt-4">
+  🔓 Déconnexion
+</button>
+
+  <script>
+    // 🔧 Config Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyA5uc-TxW-PWpdeZY9Y_kHiSFUjsy2x4Qo",
+      authDomain: "restauration-a39ad.firebaseapp.com",
+      projectId: "restauration-a39ad",
+      storageBucket: "restauration-a39ad.appspot.com",
+      messagingSenderId: "1090098740734",
+      appId: "1:1090098740734:web:8cc8c52d98968b42f614af"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    // const storage = firebase.storage(); // Firebase Storage n'est plus utilisé pour l'upload direct
+
+    const listeCommandes = document.getElementById("listeCommandes");
+    const listeReservations = document.getElementById("listeReservations");
+    const listePlats = document.getElementById("listePlats"); // Pour la gestion des plats
+
+    // 📥 Afficher les commandes
+    db.collection("commandes")
+      .orderBy("date", "desc")
+      .onSnapshot(snapshot => {
+        listeCommandes.innerHTML = "";
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const tr = document.createElement("tr");
+
+          tr.innerHTML = `
+            <td class="border px-4 py-2 font-bold">${data.codeCommande}</td>
+            <td class="border px-4 py-2">${data.nom}</td>
+            <td class="border px-4 py-2">${data.plat}</td>
+            <td class="border px-4 py-2">${data.quantite}</td>
+            <td class="border px-4 py-2">${data.telephone}</td>
+            <td class="border px-4 py-2">${data.adresse}</td>
+            <td class="border px-4 py-2 text-sm">${data.date}</td>
+            <td class="border px-4 py-2">
+              <select class="border rounded p-1 text-sm" onchange="updateStatut('${doc.id}', this.value)">
+                <option value="En attente" ${data.statut === "En attente" ? "selected" : ""}>En attente</option>
+                <option value="En cours" ${data.statut === "En cours" ? "selected" : ""}>En cours</option>
+                <option value="Livrée" ${data.statut === "Livrée" ? "selected" : ""}>Livrée</option>
+              </select>
+            </td>
+            <td class="border px-4 py-2">
+              <button onclick="supprimerCommande('${doc.id}')" class="text-red-600 hover:underline text-sm">Supprimer</button>
+            </td>
+          `;
+          
+          listeCommandes.appendChild(tr);
+        });
+      });
+      
+
+    // ✅ Mettre à jour le statut (Commandes)
+    function updateStatut(docId, nouveauStatut) {
+      db.collection("commandes").doc(docId).update({ statut: nouveauStatut })
+        .then(() => console.log("✅ Statut commande mis à jour :", nouveauStatut))
+        .catch(err => alert("Erreur lors de la mise à jour du statut de la commande"));
+    }
+    window.updateStatut = updateStatut; // Exposer à la fenêtre globale
+
+    // ❌ Supprimer une commande
+    function supprimerCommande(docId) {
+      if (confirm("Voulez-vous vraiment supprimer cette commande ?")) {
+        db.collection("commandes").doc(docId).delete()
+          .then(() => console.log("🗑️ Commande supprimée"))
+          .catch(err => alert("Erreur lors de la suppression de la commande"));
+      }
+    }
+    window.supprimerCommande = supprimerCommande; // Exposer à la fenêtre globale
+
+    // 📥 Afficher les réservations
+    db.collection("reservations")
+      .orderBy("timestamp", "desc")
+      .onSnapshot(snapshot => {
+        listeReservations.innerHTML = "";
+        snapshot.forEach(doc => {
+          const r = doc.data();
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="border px-4 py-2">${r.nom}</td>
+            <td class="border px-4 py-2">${r.telephone}</td>
+            <td class="border px-4 py-2">${r.email}</td>
+            <td class="border px-4 py-2">${r.date}</td>
+            <td class="border px-4 py-2">${r.heure}</td>
+            <td class="border px-4 py-2">${r.personnes}</td>
+            <td class="border px-4 py-2">${r.message || "-"}</td>
+            <td class="border px-4 py-2">
+              <select class="border rounded p-1 text-sm" onchange="updateReservationStatut('${doc.id}', this.value)">
+                <option value="En attente" ${r.statut === "En attente" ? "selected" : ""}>En attente</option>
+                <option value="Confirmée" ${r.statut === "Confirmée" ? "selected" : ""}>Confirmée</option>
+                <option value="Annulée" ${r.statut === "Annulée" ? "selected" : ""}>Annulée</option>
+              </select>
+            </td>
+            <td class="border px-4 py-2">
+              <button onclick="supprimerReservation('${doc.id}')" class="text-red-600 hover:underline text-sm">Supprimer</button>
+            </td>
+          `;
+          listeReservations.appendChild(tr);
+        });
+      });
+
+    // ✅ Mettre à jour le statut (Réservations)
+    function updateReservationStatut(id, statut) {
+      db.collection("reservations").doc(id).update({ statut })
+        .then(() => console.log("✅ Statut réservation mis à jour :", statut))
+        .catch(err => alert("Erreur lors de la mise à jour du statut de la réservation"));
+    }
+    window.updateReservationStatut = updateReservationStatut; // Exposer à la fenêtre globale
+
+    // ❌ Supprimer une réservation
+    function supprimerReservation(id) {
+      if (confirm("Supprimer cette réservation ?")) {
+        db.collection("reservations").doc(id).delete()
+          .then(() => console.log("🗑️ Réservation supprimée"))
+          .catch(err => alert("Erreur lors de la suppression de la réservation"));
+      }
+    }
+    window.supprimerReservation = supprimerReservation; // Exposer à la fenêtre globale
+
+
+    // 🍽️ GESTION DES PLATS 🍽️
+
+    const addDishForm = document.getElementById("addDishForm");
+    const dishAddMessage = document.getElementById("dishAddMessage");
+    const addDishButton = document.getElementById("addDishButton"); // Le bouton d'ajout de plat
+
+    // ➕ Ajouter un nouveau plat
+    addDishForm?.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const dishName = document.getElementById("dishName").value;
+      const dishDescription = document.getElementById("dishDescription").value;
+      const dishPrice = parseFloat(document.getElementById("dishPrice").value);
+      const dishCategory = document.getElementById("dishCategory").value;
+      const dishImageUrl = document.getElementById("dishImageUrl").value; // Récupère l'URL du champ texte
+
+      if (!dishImageUrl) {
+        dishAddMessage.textContent = "❌ L'URL de l'image est requise.";
+        dishAddMessage.classList.remove("hidden", "text-green-600");
+        dishAddMessage.classList.add("text-red-600");
+        setTimeout(() => dishAddMessage.classList.add("hidden"), 3000);
+        return;
+      }
+
+      // Désactiver le bouton et montrer un message de chargement (si souhaité)
+      addDishButton.disabled = true;
+      addDishButton.textContent = "Ajout en cours...";
+      dishAddMessage.classList.remove("hidden", "text-red-600", "text-green-600");
+      dishAddMessage.classList.add("text-blue-600");
+      dishAddMessage.textContent = "Ajout du plat...";
+
+      try {
+        // Enregistrer les données du plat dans Firestore avec l'URL de l'image
+        const dish = {
+          name: dishName,
+          description: dishDescription,
+          price: dishPrice,
+          category: dishCategory,
+          imageUrl: dishImageUrl, // L'URL de l'image fournie par l'admin
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        await db.collection("dishes").add(dish);
+
+        dishAddMessage.textContent = "✅ Plat ajouté avec succès !";
+        dishAddMessage.classList.remove("hidden", "text-red-600", "text-blue-600");
+        dishAddMessage.classList.add("text-green-600");
+        addDishForm.reset(); // Réinitialiser le formulaire
+        loadDishes(); // Recharger la liste des plats
+
+      } catch (error) {
+        console.error("❌ Erreur lors de l'ajout du plat :", error);
+        dishAddMessage.textContent = "❌ Erreur : " + error.message;
+        dishAddMessage.classList.remove("hidden", "text-green-600", "text-blue-600");
+        dishAddMessage.classList.add("text-red-600");
+      } finally {
+        // Réactiver le bouton et masquer le message après un court délai
+        addDishButton.disabled = false;
+        addDishButton.textContent = "Ajouter le plat";
+        setTimeout(() => dishAddMessage.classList.add("hidden"), 5000);
+      }
+    });
+
+    // 📥 Afficher les plats
+    async function loadDishes() {
+      listePlats.innerHTML = ""; // Vider la liste actuelle
+      try {
+        const snapshot = await db.collection("dishes").orderBy("createdAt", "desc").get();
+        snapshot.forEach(doc => {
+          const dish = doc.data();
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="border px-4 py-2">${dish.name}</td>
+            <td class="border px-4 py-2">${dish.category.charAt(0).toUpperCase() + dish.category.slice(1)}</td>
+            <td class="border px-4 py-2">${dish.price} FCFA</td>
+            <td class="border px-4 py-2">
+                <img src="${dish.imageUrl}" alt="${dish.name}" class="h-16 w-16 object-cover rounded">
+            </td>
+            <td class="border px-4 py-2">
+              <button onclick="deleteDish('${doc.id}')" class="text-red-600 hover:underline text-sm">Supprimer</button>
+            </td>
+          `;
+          listePlats.appendChild(tr);
+        });
+      } catch (error) {
+        console.error("❌ Erreur lors du chargement des plats :", error);
+        listePlats.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-600">Erreur de chargement des plats.</td></tr>';
+      }
+    }
+    
+    // ❌ Supprimer un plat (l'image sur Imgur NE sera PAS supprimée automatiquement)
+    async function deleteDish(dishId) { // imageUrl n'est plus un paramètre nécessaire ici
+      if (confirm("Voulez-vous vraiment supprimer ce plat ? (L'image sur Imgur ne sera pas supprimée automatiquement.)")) {
+        try {
+          // Supprimer le document du plat de Firestore
+          await db.collection("dishes").doc(dishId).delete();
+          console.log("🗑️ Plat supprimé de Firestore");
+
+          loadDishes(); // Recharger la liste après suppression
+        } catch (error) {
+          console.error("❌ Erreur lors de la suppression du plat :", error);
+          alert("Erreur lors de la suppression du plat : " + error.message);
+        }
+      }
+    }
+    window.deleteDish = deleteDish; // Exposer à la fenêtre globale
+
+    // Charger les plats au démarrage de l'admin
+    loadDishes();
+
+  </script>
+  
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+  // Empêche l'accès si non connecté
+  firebase.auth().onAuthStateChanged(user => {
+    if (!user) {
+      window.location.href = "login.html";
+    }
+  });
+</script>
+</body>
+</html>

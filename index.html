@@ -52,31 +52,282 @@
         }
     </style>
 </head>
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyA5uc-TxW-PWpdeZY9Y_kHiSFUjsy2x4Qo",
-    authDomain: "restauration-a39ad.firebaseapp.com",
-    projectId: "restauration-a39ad",
-    storageBucket: "restauration-a39ad.firebasestorage.app",
-    messagingSenderId: "1090098740734",
-    appId: "1:1090098740734:web:8cc8c52d98968b42f614af",
-    measurementId: "G-J84PPJZ25D"
-  };
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    emailjs.init("ocvVgLNy6sWLzZFvx"); // Initialisation EmailJS
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+    // 🔧 Config Firebase (NOTE: Pour une application en production, ces clés devraient être gérées de manière plus sécurisée, par ex. via des variables d'environnement sur le serveur, et non exposées côté client.)
+    const firebaseConfig = {
+      apiKey: "AIzaSyA5uc-TxW-PWpdeZY9Y_kHiSFUjsy2x4Qo",
+      authDomain: "restauration-a39ad.firebaseapp.com",
+      projectId: "restauration-a39ad",
+      storageBucket: "restauration-a39ad.appspot.com",
+      messagingSenderId: "1090098740734",
+      appId: "1:1090098740734:web:8cc8c52d98968b42f614af"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const form = document.getElementById("formCommande");
+    const confirmation = document.getElementById("confirmation");
+    const sectionCommande = document.getElementById("commande");
+    const zoneCommande = document.getElementById("zoneCommande");
+    const selectPlat = document.getElementById("plat");
+    const menuItemsContainer = document.querySelector(".menu-items"); // Conteneur pour les plats
+    const menuFilterButtons = document.querySelectorAll('.inline-flex button');
+
+    // 🍽️ Charger et afficher les plats du menu
+    async function loadMenuItems() {
+        menuItemsContainer.innerHTML = ''; // Vider les plats existants
+        selectPlat.innerHTML = '<option value="">-- Choisir un plat --</option>'; // Vider les options du formulaire de commande
+
+        try {
+            const snapshot = await db.collection("dishes").orderBy("category").get(); // Récupérer les plats
+            snapshot.forEach(doc => {
+                const dish = doc.data();
+                const dishId = doc.id; // Pour référence si besoin
+
+                // Ajouter au menu
+                const categoryClass = {
+                    "entrees": "bg-yellow-100 text-yellow-800",
+                    "plats": "bg-green-100 text-green-800",
+                    "desserts": "bg-purple-100 text-purple-800"
+                }[dish.category] || "bg-gray-100 text-gray-800"; // Fallback
+
+                const dishCard = `
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden dish-card transition duration-300 ${dish.category}" data-category="${dish.category}">
+                        <img src="${dish.imageUrl}" alt="${dish.name}" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-xl font-bold text-gray-900">${dish.name}</h3>
+                                <span class="${categoryClass} text-xs font-semibold px-2.5 py-0.5 rounded">${dish.category.charAt(0).toUpperCase() + dish.category.slice(1)}</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">${dish.description}</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-yellow-600">${dish.price} FCFA</span>
+                                <button class="btnCommander bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300" data-plat="${dish.name}">
+                                    Commander
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                menuItemsContainer.insertAdjacentHTML('beforeend', dishCard);
+
+                // Ajouter au select du formulaire de commande
+                const option = document.createElement('option');
+                option.value = dish.name;
+                option.textContent = dish.name;
+                selectPlat.appendChild(option);
+            });
+
+            // Réinitialiser les écouteurs pour les nouveaux boutons "Commander"
+            setupCommanderButtons();
+
+        } catch (error) {
+            console.error("❌ Erreur lors du chargement des plats :", error);
+            menuItemsContainer.innerHTML = '<p class="text-center text-red-600 col-span-full">Erreur de chargement du menu. Veuillez réessayer plus tard.</p>';
+        }
+    }
+
+    // ➡️ Fonction pour attacher les écouteurs aux boutons "Commander"
+    function setupCommanderButtons() {
+        const boutonsCommander = document.querySelectorAll('.btnCommander');
+        boutonsCommander.forEach(bouton => {
+            bouton.removeEventListener('click', handleCommanderClick); // Éviter les écouteurs multiples
+            bouton.addEventListener('click', handleCommanderClick);
+        });
+    }
+
+    function handleCommanderClick() {
+        const plat = this.dataset.plat;
+        selectPlat.value = plat;
+        sectionCommande.classList.remove('hidden');
+        zoneCommande.classList.remove('hidden');
+        sectionCommande.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // 📦 Filtrage du menu
+    function filterMenu(category) {
+        const menuItems = document.querySelectorAll('.menu-items > div');
+        menuItems.forEach(item => {
+            if (category === 'all') {
+                item.classList.remove('hidden');
+            } else {
+                item.dataset.category === category
+                    ? item.classList.remove('hidden')
+                    : item.classList.add('hidden');
+            }
+        });
+
+        // Mettre à jour le style actif des boutons de filtre
+        menuFilterButtons.forEach(button => {
+            button.classList.remove('bg-yellow-600', 'text-white');
+            button.classList.add('bg-white', 'text-gray-900');
+        });
+        document.querySelector(`.inline-flex button[onclick="filterMenu('${category}')"]`).classList.add('bg-yellow-600', 'text-white');
+        document.querySelector(`.inline-flex button[onclick="filterMenu('${category}')"]`).classList.remove('bg-white', 'text-gray-900');
+    }
+
+    // Exposer filterMenu au scope global pour les appels onclick dans le HTML
+    window.filterMenu = filterMenu; 
+
+    // 🛒 Soumission de commande
+    form?.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const codeCommande = "BAO-" + Date.now().toString().slice(-5);
+      document.getElementById('dateCommande').value = new Date().toLocaleString();
+
+      const variablesEmail = {
+        nom: form.nom.value,
+        telephone: form.telephone.value,
+        adresse: form.adresse.value,
+        plat: form.plat.value,
+        quantite: form.quantite.value,
+        codeCommande: codeCommande,
+        statut: "En attente",
+        email: document.getElementById("email").value,
+        to_email: document.getElementById("email").value 
+      };
+
+      try {
+        await db.collection("commandes").add({
+          ...variablesEmail,
+          date: new Date().toLocaleString()
+        });
+
+        await emailjs.send("service_v774uxi", "template_5nnp0v4", variablesEmail);
+
+        confirmation.textContent = `✅ Commande envoyée avec succès ! Code : ${codeCommande}`;
+        confirmation.classList.remove("hidden");
+        form.reset();
+
+        setTimeout(() => {
+          confirmation.classList.add("hidden");
+          zoneCommande.classList.add("hidden");
+        }, 5000);
+
+      } catch (error) {
+        console.error("❌ Erreur EmailJS :", error);
+        alert("Erreur lors de l'envoi :\n" + (error?.text || error?.message || "Erreur inconnue"));
+      }
+    });
+
+    // suivi de commande
+    const formSuivi = document.getElementById("formSuivi");
+    const resultatSuivi = document.getElementById("resultatSuivi");
+
+    formSuivi?.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const code = document.getElementById("codeSuivi").value.trim().toUpperCase();
+
+      try {
+        const snap = await db.collection("commandes")
+          .where("codeCommande", "==", code)
+          .get();
+
+        if (snap.empty) {
+          resultatSuivi.textContent = "❌ Aucune commande trouvée.";
+          resultatSuivi.classList.remove("hidden", "text-green-600");
+          resultatSuivi.classList.add("text-red-600");
+        } else {
+          snap.forEach(doc => {
+            const data = doc.data();
+            resultatSuivi.textContent = `✅ Statut : ${data.statut}`;
+            resultatSuivi.classList.remove("hidden", "text-red-600");
+            resultatSuivi.classList.add("text-green-600");
+          });
+        }
+      } catch (err) {
+        resultatSuivi.textContent = "❌ Erreur lors de la recherche.";
+        resultatSuivi.classList.remove("hidden");
+        resultatSuivi.classList.add("text-red-600");
+      }
+    });
+
+    // 📩 Réservation
+    const reservationForm = document.getElementById("reservation-form");
+    const resConfirmation = document.getElementById("res-confirmation");
+
+    reservationForm?.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const reservation = {
+        nom: document.getElementById("res-nom").value,
+        email: document.getElementById("res-email").value,
+        telephone: document.getElementById("res-tel").value,
+        date: document.getElementById("res-date").value,
+        heure: document.getElementById("res-heure").value,
+        personnes: document.getElementById("res-personnes").value,
+        message: document.getElementById("res-message").value,
+        statut: "En attente",
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      // 💌 Envoi client
+      emailjs.send("service_v774uxi", "template_5nnp0v4", { 
+        ...reservation,
+        to_email: reservation.email
+      }).then(() => {
+        resConfirmation.textContent = "✅ Réservation envoyée avec succès !";
+        resConfirmation.classList.remove("hidden", "text-red-600");
+        resConfirmation.classList.add("text-green-600");
+        setTimeout(() => resConfirmation.classList.add("hidden"), 5000);
+      }).catch((error) => {
+        console.error("Erreur EmailJS client :", error);
+        resConfirmation.textContent = "❌ Erreur lors de l'envoi de la confirmation de réservation.";
+        resConfirmation.classList.remove("hidden", "text-green-600");
+        resConfirmation.classList.add("text-red-600");
+        setTimeout(() => resConfirmation.classList.add("hidden"), 5000);
+      });
+
+      // 💌 Envoi admin
+      emailjs.send("service_v774uxi", "template_admin_reservation", {
+        ...reservation,
+        to_email: "lebaobab@gmail.com" // Assurez-vous que cette adresse est correcte
+      }).catch((error) => {
+        console.error("Erreur EmailJS admin :", error);
+      });
+
+      // 🔐 Enregistrement dans Firestore
+      db.collection("reservations").add(reservation)
+        .then(() => {
+          document.getElementById("reservation-form").reset();
+          console.log("✅ Réservation enregistrée dans Firestore");
+        })
+        .catch((error) => {
+          console.error("❌ Erreur Firestore : " + error.message);
+          resConfirmation.textContent = "❌ Erreur lors de l'enregistrement de la réservation.";
+          resConfirmation.classList.remove("hidden", "text-green-600");
+          resConfirmation.classList.add("text-red-600");
+          setTimeout(() => resConfirmation.classList.add("hidden"), 5000);
+        });
+    });
+
+    // 📩 Contact Form
+    const contactForm = document.getElementById('contact-form');
+    const contactConfirmation = document.getElementById('contact-confirmation'); 
+
+    contactForm?.addEventListener('submit', function (e) {
+      e.preventDefault();
+      
+      contactConfirmation.textContent = '✅ Merci pour votre message ! Nous vous répondrons rapidement.';
+      contactConfirmation.classList.remove('hidden', 'text-red-600');
+      contactConfirmation.classList.add('text-green-600');
+      contactForm.reset();
+      setTimeout(() => contactConfirmation.classList.add('hidden'), 5000);
+    });
+
+    loadMenuItems(); // Appeler au chargement de la page pour afficher le menu
+  });
 </script>
+
+
 <body class="font-sans bg-gray-50">
-    <!-- Navigation -->
     <nav class="fixed w-full bg-white shadow-md z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -104,7 +355,6 @@
             </div>
         </div>
         
-        <!-- Mobile menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="#accueil" class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-yellow-600">Accueil</a>
@@ -117,7 +367,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section id="accueil" class="hero flex items-center justify-center text-center text-white pt-16">
         <div class="max-w-4xl px-4 fade-in">
             <h1 class="text-4xl md:text-6xl font-bold mb-6">Découvrez les saveurs du Sénégal</h1>
@@ -129,7 +378,6 @@
         </div>
     </section>
 
-    <!-- About Section -->
     <section class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="lg:flex lg:items-center lg:justify-between">
@@ -166,7 +414,6 @@
         </div>
     </section>
 
-    <!-- Menu Section -->
     <section id="menu" class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -174,7 +421,6 @@
                 <p class="text-gray-600 max-w-2xl mx-auto">Découvrez nos spécialités sénégalaises préparées avec des ingrédients frais et des recettes traditionnelles.</p>
             </div>
             
-            <!-- Menu Tabs -->
             <div class="flex justify-center mb-12">
                 <div class="inline-flex rounded-md shadow-sm">
                     <button onclick="filterMenu('all')" class="px-4 py-2 text-sm font-medium rounded-l-lg bg-yellow-600 text-white">
@@ -192,129 +438,8 @@
                 </div>
             </div>
             
-            <!-- Menu Items -->
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 menu-items">
-                <!-- Entrée 1 -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden dish-card transition duration-300 entree" data-category="entrees">
-                    <img src="./image/accras-de-morue.webp" alt="Accras" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold text-gray-900">Accras de morue</h3>
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Entrée</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">Beignets de morue parfumés aux herbes et épices, servis avec une sauce piquante.</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-lg font-bold text-yellow-600">5,240 FCFA</span>
-                            <button 
-  class="btnCommander bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-  data-plat="Accras de morue">
-  Commander
-</button>
-                        </div>
-                    </div>
                 </div>
-                
-                <!-- Plat 1 -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden dish-card transition duration-300 plat" data-category="plats">
-                    <img src="./image/Thieboudienne.jpeg" alt="Thieboudienne" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold text-gray-900">Thieboudienne</h3>
-                            <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Plat</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">Le plat national sénégalais : riz au poisson avec légumes, cuisiné dans une sauce tomate parfumée.</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-lg font-bold text-yellow-600">10,480 FCFA</span>
-                            <button 
-  class="btnCommander bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-  data-plat="Thieboudienne">
-  Commander
-</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Plat 2 -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden dish-card transition duration-300 plat" data-category="plats">
-                    <img src="./image/Yassa poulet.jpeg" alt="Yassa" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold text-gray-900">Yassa poulet</h3>
-                            <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Plat</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">Poulet mariné au citron et oignons, servi avec du riz blanc. Un classique de la cuisine sénégalaise.</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-lg font-bold text-yellow-600">9,825 FCFA</span>
-                            <button 
-  class="btnCommander bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-  data-plat="Yassa Poulet">
-  Commander
-</button>
-
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Entrée 2 -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden dish-card transition duration-300 entree" data-category="entrees">
-                    <img src="./image/Salade sénégalaise.jpeg" alt="Salade sénégalaise" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold text-gray-900">Salade sénégalaise</h3>
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Entrée</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">Mélange frais de légumes locaux avec une vinaigrette à l'huile d'arachide et citron.</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-lg font-bold text-yellow-600">4,585 FCFA</span>
-                            <button 
-  class="btnCommander bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-  data-plat="Salade sénégalaise">
-  Commander
-</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Dessert 1 -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden dish-card transition duration-300 dessert" data-category="desserts">
-                    <img src="./image/Thiakry.jpeg" alt="Thiakry" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold text-gray-900">Thiakry</h3>
-                            <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded">Dessert</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">Dessert traditionnel à base de mil, yaourt et fruits secs, parfumé à la vanille.</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-lg font-bold text-yellow-600">3,930 FCFA</span>
-                            <button 
-  class="btnCommander bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-  data-plat="Thiakry">
-  Commander
-</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Plat 3 -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden dish-card transition duration-300 plat" data-category="plats">
-                    <img src="./image/Mafé.jpeg" alt="Mafé" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold text-gray-900">Mafé</h3>
-                            <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Plat</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">Ragoût de viande (bœuf ou agneau) dans une sauce à la pâte d'arachide, servi avec du riz.</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-lg font-bold text-yellow-600">11,135 FCFA</span>
-                            <button 
-  class="btnCommander bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-  data-plat="Mafé">
-  Commander
-</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
             
             <div class="text-center mt-12">
                 <a href="#" class="inline-block bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
@@ -324,7 +449,7 @@
         </div>
     </section>
     <section id="commande" class="hidden py-16 bg-gray-100">
-  <div class="container mx-auto px-4 max-w-2xl">
+  <div class="container mx-auto px-4 max-w-2xl" id="zoneCommande">
     <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Commander un plat</h2>
 
     <form id="formCommande" class="bg-white p-8 rounded-lg shadow-md space-y-4">
@@ -332,13 +457,7 @@
         <label for="plat" class="block mb-1 font-semibold">Plat</label>
         <select id="plat" name="plat" class="w-full border border-gray-300 rounded p-2" required>
           <option value="">-- Choisir un plat --</option>
-          <option value="Thieboudienne">Thieboudienne</option>
-          <option value="Yassa Poulet">Yassa Poulet</option>
-          <option value="Mafé">Mafé</option>
-          <option value="Salade sénégalaise">Salade sénégalaise</option>
-          <option value="Accras de morue">Accras de morue</option>
-          <option value="Thiakry">Thiakry</option>
-        </select>
+          </select>
       </div>
 
       <div>
@@ -360,8 +479,11 @@
         <label for="adresse" class="block mb-1 font-semibold">Adresse de livraison</label>
         <textarea id="adresse" name="adresse" class="w-full border border-gray-300 rounded p-2" rows="3" required></textarea>
       </div>
+      <div>
+  <label for="email" class="block mb-1 font-semibold">Email</label>
+  <input type="email" id="email" name="email" class="w-full border border-gray-300 rounded p-2" required>
+</div>
 
-      <!-- Champ caché pour la date -->
       <input type="hidden" name="date" id="dateCommande">
 
       <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded w-full">
@@ -373,91 +495,82 @@
       ✅ Commande envoyée avec succès !
     </p>
   </div>
+  <section id="suiviCommande" class="py-16 bg-white">
+  <div class="container mx-auto max-w-md px-4">
+    <h2 class="text-3xl font-bold text-center mb-6 text-gray-800">📦 Suivre ma commande</h2>
+    <form id="formSuivi" class="bg-gray-100 p-6 rounded-lg shadow space-y-4">
+      <label for="codeSuivi" class="block font-semibold">Code de commande :</label>
+      <input type="text" id="codeSuivi" class="w-full p-2 border rounded" placeholder="Ex : BAO-54829" required>
+      <button type="submit" class="w-full bg-yellow-500 text-white font-bold py-2 rounded hover:bg-yellow-600">Voir le statut</button>
+    </form>
+
+    <div id="resultatSuivi" class="mt-6 text-center font-medium text-lg text-gray-800 hidden"></div>
+  </div>
+</section>
+
 </section>
 
 
-    <!-- Reservation Section -->
     <section id="reservation" class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="lg:flex lg:items-center lg:justify-between">
-                <div class="lg:w-1/2 mb-10 lg:mb-0">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-6">Réservez votre table</h2>
-                    <p class="text-gray-600 mb-6">Vivez une expérience culinaire unique dans notre restaurant. Réservez dès maintenant pour garantir votre place.</p>
-                    <p class="text-gray-600 mb-8">Nous sommes ouverts du Lundi au Samedi, de 11h30 à 22h30.</p>
-                    <div class="flex items-center mb-4">
-                        <div class="bg-yellow-100 p-3 rounded-full mr-4">
-                            <i class="fas fa-phone text-yellow-600"></i>
-                        </div>
-                        <div>
-                            <p class="text-gray-500">Pour les réservations par téléphone</p>
-                            <p class="text-xl font-bold text-gray-900">221 78 501 65 71</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="bg-yellow-100 p-3 rounded-full mr-4">
-                            <i class="fas fa-envelope text-yellow-600"></i>
-                        </div>
-                        <div>
-                            <p class="text-gray-500">Ou par email</p>
-                            <p class="text-xl font-bold text-gray-900">reservation@lebaobab.com</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="lg:w-1/2 lg:pl-12">
-                    <div class="bg-gray-50 p-8 rounded-lg shadow-md">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-6">Formulaire de réservation</h3>
-                        <form id="reservation-form">
-                            <div class="mb-4">
-                                <label for="name" class="block text-gray-700 font-medium mb-2">Nom complet</label>
-                                <input type="text" id="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
-                                <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="phone" class="block text-gray-700 font-medium mb-2">Téléphone</label>
-                                <input type="tel" id="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <label for="date" class="block text-gray-700 font-medium mb-2">Date</label>
-                                    <input type="date" id="date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
-                                </div>
-                                <div>
-                                    <label for="time" class="block text-gray-700 font-medium mb-2">Heure</label>
-                                    <input type="time" id="time" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
-                                </div>
-                            </div>
-                            <div class="mb-4">
-                                <label for="guests" class="block text-gray-700 font-medium mb-2">Nombre de personnes</label>
-                                <select id="guests" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent" required>
-                                    <option value="1">1 personne</option>
-                                    <option value="2">2 personnes</option>
-                                    <option value="3">3 personnes</option>
-                                    <option value="4">4 personnes</option>
-                                    <option value="5">5 personnes</option>
-                                    <option value="6">6 personnes</option>
-                                    <option value="7">7 personnes</option>
-                                    <option value="8">8 personnes</option>
-                                    <option value="9">9 personnes ou plus</option>
-                                </select>
-                            </div>
-                            <div class="mb-6">
-                                <label for="message" class="block text-gray-700 font-medium mb-2">Demandes spéciales</label>
-                                <textarea id="message" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"></textarea>
-                            </div>
-                            <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
-                                Réserver maintenant
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+  <div class="max-w-3xl mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-8 text-yellow-600">Réserver une table</h2>
 
-    <!-- Gallery Section -->
+    <form id="reservation-form" class="bg-gray-100 p-6 rounded-lg shadow space-y-4">
+      <div>
+        <label for="res-nom" class="block font-semibold mb-1">Nom complet</label>
+        <input type="text" id="res-nom" class="w-full border border-gray-300 rounded p-2" required>
+      </div>
+
+      <div>
+        <label for="res-email" class="block font-semibold mb-1">Email</label>
+        <input type="email" id="res-email" class="w-full border border-gray-300 rounded p-2" required>
+      </div>
+
+      <div>
+        <label for="res-tel" class="block font-semibold mb-1">Téléphone</label>
+        <input type="tel" id="res-tel" class="w-full border border-gray-300 rounded p-2" required>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="res-date" class="block font-semibold mb-1">Date</label>
+          <input type="date" id="res-date" class="w-full border border-gray-300 rounded p-2" required>
+        </div>
+        <div>
+          <label for="res-heure" class="block font-semibold mb-1">Heure</label>
+          <input type="time" id="res-heure" class="w-full border border-gray-300 rounded p-2" required>
+        </div>
+      </div>
+
+      <div>
+        <label for="res-personnes" class="block font-semibold mb-1">Nombre de personnes</label>
+        <select id="res-personnes" class="w-full border border-gray-300 rounded p-2" required>
+          <option value="">-- Sélectionner --</option>
+          <option value="1">1 personne</option>
+          <option value="2">2 personnes</option>
+          <option value="3">3 personnes</option>
+          <option value="4">4 personnes</option>
+          <option value="5">5 personnes</option>
+          <option value="6">6 personnes</option>
+          <option value="7">7 personnes</option>
+          <option value="8">8 personnes</option>
+          <option value="9+">9 ou plus</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="res-message" class="block font-semibold mb-1">Demandes spéciales</label>
+        <textarea id="res-message" rows="4" class="w-full border border-gray-300 rounded p-2"></textarea>
+      </div>
+
+      <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+        Envoyer la réservation
+      </button>
+    </form>
+
+    <p id="res-confirmation" class="mt-4 text-center font-semibold text-green-600 hidden">✅ Réservation envoyée avec succès !</p>
+  </div>
+</section>
     <section id="galerie" class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -488,7 +601,6 @@
         </div>
     </section>
 
-    <!-- Testimonials Section -->
     <section id="temoignages" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -497,7 +609,6 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Testimonial 1 -->
                 <div class="bg-gray-50 p-8 rounded-lg shadow-md testimonial-card">
                     <div class="flex items-center mb-4">
                         <div class="text-yellow-500 text-xl mr-2">
@@ -518,7 +629,6 @@
                     </div>
                 </div>
                 
-                <!-- Testimonial 2 -->
                 <div class="bg-gray-50 p-8 rounded-lg shadow-md testimonial-card">
                     <div class="flex items-center mb-4">
                         <div class="text-yellow-500 text-xl mr-2">
@@ -539,7 +649,6 @@
                     </div>
                 </div>
                 
-                <!-- Testimonial 3 -->
                 <div class="bg-gray-50 p-8 rounded-lg shadow-md testimonial-card">
                     <div class="flex items-center mb-4">
                         <div class="text-yellow-500 text-xl mr-2">
@@ -563,7 +672,6 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
     <section id="contact" class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="lg:flex lg:items-center lg:justify-between">
@@ -648,18 +756,17 @@
                                 Envoyer le message
                             </button>
                         </form>
+                        <p id="contact-confirmation" class="mt-4 text-center font-semibold text-green-600 hidden"></p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Map Section -->
     <div class="h-96 w-full">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10187755.410195619!2d-17.8809718814943!3d14.497401340143975!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xec1723c3613edc1%3A0xe8ea631eb2f8ef90!2sS%C3%A9n%C3%A9gal!5e0!3m2!1sfr!2ssn!4v1719935420702!5m2!1sfr!2ssn" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+        <iframe src="https://www.google.com/maps/embed/v1/view?key=AIzaSyAJifc7pwvUkN0yrtn7BPn8I-lRg33PSNc&center=14.7852778,-17.3105556&zoom=12&maptype=satellite" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
     </div>
 
-    <!-- Footer -->
     <footer class="bg-gray-900 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -708,8 +815,8 @@
                     <h3 class="text-lg font-semibold mb-4">Contact</h3>
                     <address class="not-italic text-gray-400">
                         <p class="mb-2">123 Avenue de la Teranga</p>
-                        <p class="mb-2">75000 Paris, France</p>
-                        <p class="mb-2">01 23 45 67 89</p>
+                        <p class="mb-2">Keur Massar, Dakar, Senegal</p>
+                        <p class="mb-2">221 78 607 94 71</p>
                         <p>contact@lebaobab.com</p>
                     </address>
                     
@@ -736,59 +843,18 @@
                 </div>
             </div>
         </div>
+         <div class="mt-6 text-center">
+    <a href="login.html" class="text-gray-400 hover:text-yellow-500 text-sm underline">👤 Accès admin</a>
+  </div>
     </footer>
 
-   <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-<script>
-  // Initialise EmailJS
-  (function () {
-    emailjs.init("51LSgeD5TYsxLrqWs"); // Remplace par ta clé publique EmailJS
-  })();
-
+   <script>
   // 🍔 Menu mobile toggle
   const mobileMenuButton = document.getElementById('mobile-menu-button');
   const mobileMenu = document.getElementById('mobile-menu');
 
-  mobileMenuButton.addEventListener('click', () => {
+  mobileMenuButton?.addEventListener('click', () => {
     mobileMenu.classList.toggle('hidden');
-  });
-
-  // 📋 Filtrage du menu
-  function filterMenu(category) {
-    const menuItems = document.querySelectorAll('.menu-items > div');
-
-    menuItems.forEach(item => {
-      if (category === 'all') {
-        item.classList.remove('hidden');
-      } else {
-        item.dataset.category === category
-          ? item.classList.remove('hidden')
-          : item.classList.add('hidden');
-      }
-    });
-
-    // Mettre à jour le style actif des boutons
-    document.querySelectorAll('.inline-flex button').forEach(button => {
-      button.classList.remove('bg-yellow-600', 'text-white');
-      button.classList.add('bg-white', 'text-gray-900');
-    });
-
-    event.target.classList.add('bg-yellow-600', 'text-white');
-    event.target.classList.remove('bg-white', 'text-gray-900');
-  }
-
-  // 📅 Animation fade-in
-  const fadeElements = document.querySelectorAll('.fade-in');
-  const fadeInObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('fade-in');
-      }
-    });
-  }, { threshold: 0.1 });
-
-  fadeElements.forEach(element => {
-    fadeInObserver.observe(element);
   });
 
   // 🔗 Ancrage avec scroll doux
@@ -811,65 +877,6 @@
         }
       }
     });
-  });
-
-  // 📨 Réservation (alerte simple)
-  const reservationForm = document.getElementById('reservation-form');
-  if (reservationForm) {
-    reservationForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      alert('Merci pour votre réservation ! Nous vous contacterons bientôt.');
-      this.reset();
-    });
-  }
-
-  // 📨 Contact (alerte simple)
-  const contactForm = document.getElementById('contact-form');
-  if (contactForm) {
-    contactForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      alert('Merci pour votre message ! Nous vous répondrons rapidement.');
-      this.reset();
-    });
-  }
-
-  // 🛒 COMMANDE DE PLATS
-  const boutonsCommander = document.querySelectorAll('.btnCommander');
-  const selectPlat = document.getElementById('plat');
-  const sectionCommande = document.getElementById('commande');
-  const form = document.getElementById('formCommande');
-  const confirmation = document.getElementById('confirmation');
-
-  // Quand on clique sur un bouton Commander
-  boutonsCommander.forEach(bouton => {
-    bouton.addEventListener('click', () => {
-      const plat = bouton.dataset.plat;
-      selectPlat.value = plat;
-      sectionCommande.classList.remove('hidden');
-      sectionCommande.scrollIntoView({ behavior: 'smooth' });
-    });
-  });
-
-  // Soumission du formulaire de commande
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    // Ajoute la date actuelle dans le champ caché
-    document.getElementById('dateCommande').value = new Date().toLocaleString();
-
-    // Envoi via EmailJS
-    emailjs.sendForm('service_v774uxi', 'template_5nnp0v4', this)
-      .then(() => {
-        confirmation.classList.remove('hidden');
-        form.reset();
-
-        setTimeout(() => {
-          confirmation.classList.add('hidden');
-          sectionCommande.classList.add('hidden');
-        }, 3000);
-      }, (error) => {
-        alert("Erreur lors de l'envoi de la commande : " + error.text);
-      });
   });
 </script>
 

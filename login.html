@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
+    <h1 class="text-2xl font-bold mb-6 text-center text-yellow-600">🔐 Connexion Admin</h1>
+    <form id="loginForm" class="space-y-4">
+      <input type="email" id="email" class="w-full border p-2 rounded" placeholder="Email admin" required>
+      <input type="password" id="password" class="w-full border p-2 rounded" placeholder="Mot de passe" required>
+      <button type="submit" class="w-full bg-yellow-600 text-white font-bold py-2 rounded hover:bg-yellow-700">Se connecter</button>
+    </form>
+    <p id="erreur" class="text-red-600 text-sm mt-4 text-center hidden"></p>
+  </div>
+
+  <script>
+    // Firebase config (NOTE: Pour une application en production, ces clés devraient être gérées de manière plus sécurisée, par ex. via des variables d'environnement sur le serveur, et non exposées côté client.)
+    const firebaseConfig = {
+      apiKey: "AIzaSyA5uc-TxW-PWpdeZY9Y_kHiSFUjsy2x4Qo",
+      authDomain: "restauration-a39ad.firebaseapp.com",
+      projectId: "restauration-a39ad",
+      storageBucket: "restauration-a39ad.appspot.com",
+      messagingSenderId: "1090098740734",
+      appId: "1:1090098740734:web:8cc8c52d98968b42f614af"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const email = emailInput.value;
+      const password = passwordInput.value;
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          window.location.href = "admin.html";
+        })
+        .catch(error => {
+          document.getElementById("erreur").textContent = "❌ " + error.message;
+          document.getElementById("erreur").classList.remove("hidden");
+        });
+    });
+
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+  </script>
+</body>
+</html>
